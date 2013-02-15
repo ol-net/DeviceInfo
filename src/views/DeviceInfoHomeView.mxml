@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		title="HomeView" creationComplete="parse();">
+
+	
+	<fx:Script>
+		<![CDATA[
+			
+			private var info_array:Array = ["net.bt.name",
+											"ro.build.version.release", 
+											"ro.build.display.id", 
+											"ro.build.version.sdk", 
+											"ro.build.description", 
+											"ro.product.model", 
+											"ro.product.brand", 
+											"ro.product.name", 
+											"ro.product.version", 
+											"ro.product.board", 
+											"ro.product.cpu.abi", 
+											"ro.product.manufacturer",
+											"ro.opengles.version", 
+											"ro.sf.lcd_density", 
+											"dalvik.vm.heapsize"];
+			
+			private var value_array:Array = ["","","","","","","","","","","","","","",""];
+			
+			public function parse():void 
+			{
+				/*
+				for (var i : int = 0; i < info_array.length; i++) {
+					value_array[i] = info_array[i];
+					trace("dada "+value_array[i]);
+					text_area.text = text_area.text + info_array[i] + "\n";
+				}
+				*/
+				
+				var propFile : File = new File();
+				propFile.nativePath = "/system/build.prop";
+				
+				var fs : FileStream = new FileStream();
+				fs.open(propFile, FileMode.READ);
+				
+				var fileContents : String = fs.readUTFBytes(fs.bytesAvailable);
+				fileContents = fileContents.replace(File.lineEnding, "\n");
+				fs.close();
+				
+				// split on newlines
+				var pattern : RegExp = /\r?\n/;
+				var lines : Array = fileContents.split(pattern);
+				
+				for (var i : int = 0; i < lines.length; i++) {
+					var line : String = String(lines[i]);
+					if ( line != "") {
+						if (line.search("#") == -1) {
+							for (var j : int = 0; j < info_array.length; j++) {
+								if (line.search(info_array[j]) != -1) {
+									value_array[j] = line.split("=")[1];
+									text_area.text = text_area.text + info_array[j] + ": "+ value_array[j] + "\n";
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Group>
+		<s:TextArea id="text_area" height="{this.navigator.height}" width="{this.navigator.width}">
+			
+		</s:TextArea>
+	</s:Group> 
+</s:View>
